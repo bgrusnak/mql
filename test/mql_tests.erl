@@ -44,6 +44,10 @@ stop(_SetupData) ->
 test_query(Query, Expect) ->
 	{ok, Result}= mql:parse(Query),
 	?assertEqual(Expect, Result).
+	
+test_query(Query, Params, Expect) ->
+	{ok, Result}= mql:parse(Query, Params),
+	?assertEqual(Expect, Result).
 
 query(_) ->
   fun() ->
@@ -58,7 +62,18 @@ query(_) ->
                 '$orderby',
                 [{<<"name">>,1}]},
       skip => <<"2">>}),
-
+      
+      test_query(
+         "SELECT name, owner WHERE temperature>:temp and (color=:color1 or color=:color2) ORDER BY name ASC LIMIT 2,3",
+         [{"temp", 25}, {"color1", "\"red\""}, {"color2", <<"green">>}],
+		#{batchsize => <<"3">>,
+      projector => [{<<"name">>,1},{<<"owner">>,1}],
+      query => {'$query',{{<<"temperature">>,{'$gt',25}},
+                 {'$or',[{<<"color">>,{'$eq',<<"red">>}},
+                         {<<"color">>,{'$eq',<<"green">>}}]}},
+                '$orderby',
+                [{<<"name">>,1}]},
+      skip => <<"2">>}),
 
       test_query("SELECT * WHERE a > 2016-01-15T18:19:28Z",
                  #{batchsize => 0,

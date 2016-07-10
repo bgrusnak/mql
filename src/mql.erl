@@ -21,13 +21,14 @@
 -module('mql').
 
 %% API exports
--export([parse/1]).
+-export([parse/1, parse/2]).
 
 -export_type([query/0]).
 
 %%%_ * Types -----------------------------------------------------------
 
 -type query() :: list() | binary().
+-type placeholders() :: list().
 
 %%====================================================================
 %% API functions
@@ -42,6 +43,23 @@ parse(Query) when is_list(Query) ->
 parse(_Query) ->
   {error, unknow_input}.
 
+-spec parse(query(), placeholders()) -> {ok, list()} | {error, unknow_input}.
+parse(Query, Placeholders) when is_binary(Query) ->
+  parse(binary_to_list(Query), Placeholders);
+parse(Query, Placeholders) when is_list(Query) ->
+	NewQuery=lists:foldl(fun({Key, Value}, A) -> 
+		{ok, MP}=re:compile(":"++Key, [unicode, caseless]),
+		re:replace(A,MP, prepare(Value), [{return,list},global])
+	end, Query, Placeholders),
+	parse(NewQuery)
+.
 %%====================================================================
 %% Internal functions
 %%====================================================================
+
+
+prepare(Val) when is_integer(Val) -> integer_to_list(Val);
+prepare(Val) when is_binary(Val) -> [$"] ++ bitstring_to_list(Val) ++[$"];
+prepare(Val) when is_float(Val) -> float_to_list(Val);
+prepare(Val) when is_list(Val) -> Val;
+prepare(Val) when is_atom(Val) -> [$"] ++atom_to_list(Val)++[$"].
