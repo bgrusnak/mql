@@ -1,0 +1,16 @@
+{application, 'mql',
+ [{description,
+   "An OTP library to translate a SQL-like query in a MongoDB query."},
+  {vsn, "0.1.0"},
+  {registered, []},
+  {applications,
+   [kernel,
+    stdlib
+   ]},
+  {env,[]},
+  {modules, []},
+
+  {contributors, []},
+  {licenses, []},
+  {links, []}
+]}.
