@@ -1,10 +1,10 @@
 MQL
 =======
-An OTP library to translate a SQL-like query in a MongoDB query.
+An OTP library to translate an SQL-like query into a MongoDB query.
 Based on idea by https://github.com/hachreak/mongoql
 
 
-Examples
+Example
 --------
 
 E.g. 
@@ -13,17 +13,17 @@ E.g.
 SELECT name, owner WHERE temperature>10 and (color="green" or color="red") ORDER BY name ASC LIMIT 2,3
 ```
 
-Translated in the follow map with  MongoDB query:
+will be translated into the following map, that can be used to query MongoDB:
 
 ```erlang
 #{batchsize => <<"3">>,
-      projector => [{<<"name">>,1},{<<"owner">>,1}],
-      query => {'$query',{{<<"temperature">>,{'$gt',10}},
-                 {'$or',[{<<"color">>,{'$eq',<<"красный"/utf8>>}},
-                         {<<"color">>,{'$eq',<<"red">>}}]}},
-                '$orderby',
-                [{<<"name">>,1}]},
-      skip => <<"2">>}.
+projector => [{<<"name">>,1},{<<"owner">>,1}],
+query => {'$query',{{<<"temperature">>,{'$gt',10}},
+		 {'$or',[{<<"color">>,{'$eq',<<"green"/utf8>>}},
+				 {<<"color">>,{'$eq',<<"red">>}}]}},
+		'$orderby',
+		[{<<"name">>,1}]},
+skip => <<"2">>}.
 ```
 
 
